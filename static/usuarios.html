@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AG RENTAL - Usuarios</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #001f3f;
+      --accent: #00d0ff;
+    }
+    body {
+      background: white;
+      color: #333;
+    }
+    .navbar {
+      background: var(--primary) !important;
+    }
+    .nav-link {
+      color: #adb5bd !important;
+      font-size: 1.1rem;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--accent) !important;
+    }
+    .title-page {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 3rem;
+    }
+    .role-card {
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      padding: 2rem;
+      height: 100%;
+    }
+    .role-title {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+    }
+    .user-item {
+      padding: 0.8rem;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .user-item:hover {
+      background: #f8f9fa;
+    }
+    .user-item:last-child {
+      border-bottom: none;
+    }
+    .no-users {
+      color: #888;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold fs-4" href="/dashboard.html">AG RENTAL</a>
+      <div class="navbar-nav ms-auto">
+        <a class="nav-link" href="/dashboard.html">Dashboard</a>
+        <a class="nav-link" href="/apartamentos.html">Apartamentos</a>
+        <a class="nav-link" href="/coches.html">Coches</a>
+        <a class="nav-link active" href="/usuarios.html">Usuarios</a>
+        <a class="nav-link text-danger" href="/logout">Salir</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container my-5 pt-5">
+    <h1 class="text-center title-page">USUARIOS</h1>
+
+    <div class="row g-4">
+      <!-- Administrador -->
+      <div class="col-lg-3 col-md-6">
+        <div class="card role-card bg-light">
+          <div class="text-center text-primary role-title">
+            <i class="fas fa-user-tie fa-2x mb-3"></i><br>Administrador
+          </div>
+          <div id="admin-users" class="user-list">
+            <div class="no-users">Cargando...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empleado -->
+      <div class="col-lg-3 col-md-6">
+        <div class="card role-card bg-light">
+          <div class="text-center text-info role-title">
+            <i class="fas fa-user fa-2x mb-3"></i><br>Empleado
+          </div>
+          <div id="empleado-users" class="user-list">
+            <div class="no-users">Cargando...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Limpieza -->
+      <div class="col-lg-3 col-md-6">
+        <div class="card role-card bg-light">
+          <div class="text-center text-warning role-title">
+            <i class="fas fa-broom fa-2x mb-3"></i><br>Limpieza
+          </div>
+          <div id="limpieza-users" class="user-list">
+            <div class="no-users">Cargando...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mantenimiento -->
+      <div class="col-lg-3 col-md-6">
+        <div class="card role-card bg-light">
+          <div class="text-center text-danger role-title">
+            <i class="fas fa-tools fa-2x mb-3"></i><br>Mantenimiento
+          </div>
+          <div id="mantenimiento-users" class="user-list">
+            <div class="no-users">Cargando...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-5">
+      <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalNuevoUsuario">
+        <i class="fas fa-plus me-2"></i>Nuevo Usuario
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL NUEVO USUARIO -->
+  <div class="modal fade" id="modalNuevoUsuario" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Nuevo Usuario</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-5">
+          <form id="formNuevoUsuario">
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Usuario</label>
+                <input type="text" id="newUsername" class="form-control form-control-lg" autocomplete="off" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Contraseña</label>
+                <input type="password" id="newPassword" class="form-control form-control-lg" autocomplete="new-password" required>
+              </div>
+              <div class="col-md-12">
+                <label class="form-label fw-bold">Rol</label>
+                <select id="newRole" class="form-select form-select-lg">
+                  <option value="" disabled selected>Seleccione un rol</option>
+                  <option value="admin">Administrador</option>
+                  <option value="empleado">Empleado</option>
+                  <option value="limpieza">Limpieza</option>
+                  <option value="mantenimiento">Mantenimiento</option>
+                </select>
+              </div>
+            </div>
+            <div class="text-center mt-5">
+              <button type="button" class="btn btn-secondary btn-lg me-3" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-save me-2"></i>Crear Usuario
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR USUARIO -->
+  <div class="modal fade" id="modalEditarUsuario" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fas fa-user-edit me-2"></i>Editar Usuario</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-5">
+          <div class="text-center mb-4">
+            <i class="fas fa-user fa-5x text-primary"></i>
+          </div>
+          <h4 class="text-center" id="editUsername"></h4>
+          <div class="text-center mb-4">
+            <span class="badge fs-5" id="editRoleBadge"></span>
+          </div>
+          <form id="formEditarUsuario">
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Nueva contraseña (dejar vacío para no cambiar)</label>
+                <input type="password" id="editPassword" class="form-control form-control-lg" placeholder="••••••••">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Rol</label>
+                <select id="editRole" class="form-select form-select-lg">
+                  <option value="admin">Administrador</option>
+                  <option value="empleado">Empleado</option>
+                  <option value="limpieza">Limpieza</option>
+                  <option value="mantenimiento">Mantenimiento</option>
+                </select>
+              </div>
+            </div>
+            <div class="text-center mt-5">
+              <button type="button" class="btn btn-secondary btn-lg me-3" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-save me-2"></i>Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', loadUsers);
+
+    async function loadUsers() {
+      try {
+        const response = await fetch('/api/usuarios');
+        if (!response.ok) throw new Error('Error al cargar usuarios');
+        const users = await response.json();
+
+        const roles = {
+          admin: document.getElementById('admin-users'),
+          empleado: document.getElementById('empleado-users'),
+          limpieza: document.getElementById('limpieza-users'),
+          mantenimiento: document.getElementById('mantenimiento-users')
+        };
+
+        // Limpiar listas
+        Object.values(roles).forEach(container => container.innerHTML = '');
+
+        if (users.length === 0) {
+          Object.values(roles).forEach(container => {
+            container.innerHTML = '<div class="no-users">No hay usuarios</div>';
+          });
+          return;
+        }
+
+        users.forEach(user => {
+          const container = roles[user.role];
+          if (container) {
+            const item = document.createElement('div');
+            item.className = 'user-item';
+            item.textContent = user.username;
+            item.addEventListener('click', () => openEditModal(user.username, user.role));
+            container.appendChild(item);
+          }
+        });
+
+        // Si un rol no tiene usuarios
+        Object.keys(roles).forEach(role => {
+          if (roles[role].children.length === 0) {
+            roles[role].innerHTML = '<div class="no-users">No hay usuarios</div>';
+          }
+        });
+      } catch (error) {
+        console.error('Error cargando usuarios:', error);
+      }
+    }
+
+    function openEditModal(username, role) {
+      document.getElementById('editUsername').textContent = username;
+      const badge = document.getElementById('editRoleBadge');
+      badge.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+      badge.className = 'badge fs-5';
+      if (role === 'admin') badge.classList.add('bg-primary');
+      else if (role === 'empleado') badge.classList.add('bg-info');
+      else if (role === 'limpieza') badge.classList.add('bg-warning');
+      else if (role === 'mantenimiento') badge.classList.add('bg-danger');
+      document.getElementById('editRole').value = role;
+      const modal = new bootstrap.Modal(document.getElementById('modalEditarUsuario'));
+      modal.show();
+    }
+
+    // CONEXIÓN REAL AL BACKEND PARA CREAR USUARIO
+    document.getElementById('formNuevoUsuario').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const username = document.getElementById('newUsername').value.trim();
+      const password = document.getElementById('newPassword').value;
+      const role = document.getElementById('newRole').value;
+
+      if (!username || !password || !role) {
+        alert('Por favor, complete todos los campos');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/usuarios', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password, role })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('Usuario creado correctamente');
+          document.getElementById('formNuevoUsuario').reset();
+          document.getElementById('newRole').selectedIndex = 0;
+          bootstrap.Modal.getInstance(document.getElementById('modalNuevoUsuario')).hide();
+          loadUsers(); // Recargar la lista de usuarios
+        } else {
+          alert(data.error || 'Error al crear usuario');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión con el servidor');
+      }
+    });
+  </script>
+</body>
+</html>

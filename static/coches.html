@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AG RENTAL - Coches</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #001f3f;
+      --accent: #00d0ff;
+      --ok: #28a745;
+      --warning: #ffc107;
+      --urgent: #dc3545;
+      --info: #17a2b8;
+    }
+    body {
+      background: white;
+      color: #333;
+    }
+    .navbar {
+      background: var(--primary) !important;
+    }
+    .nav-link {
+      color: #adb5bd !important;
+      font-size: 1.1rem;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--accent) !important;
+    }
+    .title-page {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 3rem;
+    }
+    .coche-card {
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.2s;
+      position: relative;
+      height: 100%;
+    }
+    .coche-card:hover {
+      transform: translateY(-5px);
+    }
+    .coche-img {
+      height: 200px;
+      object-fit: cover;
+      width: 100%;
+    }
+    .coche-header {
+      background: var(--primary);
+      color: white;
+      padding: 0.8rem;
+      text-align: center;
+    }
+    .coche-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 0;
+    }
+    .btn-edit {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+      background: rgba(0,0,0,0.5);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+    }
+    .btn-edit:hover {
+      background: rgba(0,0,0,0.7);
+    }
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      height: 200px;
+      padding: 1rem;
+    }
+    .btn-stat {
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.9rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+      height: 100%;
+      width: 100%;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-stat:hover {
+      filter: brightness(0.85);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .icon-btn {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+    .btn-number {
+      font-size: 1.4rem;
+      font-weight: bold;
+      line-height: 1;
+    }
+    .btn-text {
+      font-weight: 600;
+      line-height: 1.2;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+    .btn-ok { background: var(--ok); color: white; }
+    .btn-pending { background: var(--warning); color: black; }
+    .btn-urgent { background: var(--urgent); color: white; }
+    .btn-info { background: var(--info); color: white; }
+    .btn-nueva-reserva {
+      border-radius: 12px;
+      background: var(--info);
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.8rem;
+      transition: all 0.2s ease;
+      margin-top: 2.5rem;
+    }
+    .btn-nueva-reserva:hover {
+      filter: brightness(0.85);
+      transform: translateY(-3px);
+    }
+    .btn-split-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      height: 100%;
+    }
+    .btn-split {
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.8rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+      height: 100%;
+      border: none;
+    }
+    .btn-split:hover {
+      filter: brightness(0.85);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .icon-split {
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+    }
+    .btn-split-text {
+      font-weight: 600;
+      line-height: 1.1;
+      text-align: center;
+      font-size: 0.7rem;
+    }
+    .btn-split-number {
+      font-size: 1.2rem;
+      font-weight: bold;
+      line-height: 1;
+    }
+    .fc-calendar {
+      max-width: 1000px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .fc-event-ocupado { background-color: var(--urgent); border-color: var(--urgent); color: white; }
+    .fc-event-reservado { background-color: var(--warning); border-color: var(--warning); color: black; }
+    .fc-toolbar-title {
+      font-size: 1.8rem !important;
+      color: var(--primary);
+    }
+    @media (max-width: 992px) {
+      .coche-img { height: 160px; }
+      .coche-name { font-size: 1.1rem; }
+      .btn-grid { height: 180px; }
+    }
+    @media (max-width: 768px) {
+      .coche-img { height: 140px; }
+      .coche-name { font-size: 1rem; }
+      .btn-grid { height: 160px; gap: 0.6rem; }
+      .title-page { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+ <nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold fs-4" href="/dashboard.html">AG RENTAL</a>
+    <div class="navbar-nav ms-auto">
+      <a class="nav-link" href="/dashboard.html">Dashboard</a>
+      <a class="nav-link" href="/apartamentos.html">Apartamentos</a>
+      <a class="nav-link" href="/coches.html">Coches</a>
+      <a class="nav-link" href="/usuarios.html">Usuarios</a>
+      <a class="nav-link text-danger" href="/logout">Salir</a>
+    </div>
+  </div>
+</nav>
+
+  <div class="container my-5">
+    <h1 class="text-center title-page">COCHES</h1>
+
+    <div class="text-end mb-4">
+      <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalNuevoCoche">
+        <i class="fas fa-plus me-2"></i>Nuevo Coche
+      </button>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <!-- COCHE 1 - Seat Ibiza -->
+      <div class="col">
+        <div class="card coche-card">
+          <img src="https://es.valleychevy.com/wp-content/uploads/2022/01/Chevy-Trax.png" alt="Seat Ibiza" class="coche-img">
+          <button class="btn btn-secondary btn-edit" data-bs-toggle="modal" data-bs-target="#modalEditarCoche1">
+            <i class="fas fa-edit"></i>
+          </button>
+          <div class="coche-header">
+            <h5 class="coche-name">chevi trax</h5>
+          </div>
+          <div class="card-body d-flex flex-column">
+            <div class="btn-grid">
+              <button class="btn btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalOcupacionCoche1">
+                <i class="fas fa-car icon-btn"></i>
+                <div class="btn-text">Libre</div>
+              </button>
+              <button class="btn btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalLimpiezaCoche1">
+                <i class="fas fa-broom icon-btn"></i>
+                <span class="btn-number">0</span>
+                <div class="btn-text">Limpieza<br>pendiente</div>
+              </button>
+              <div class="btn-split-container">
+                <button class="btn-split btn-urgent" data-bs-toggle="modal" data-bs-target="#modalMantenimientoCoche1">
+                  <i class="fas fa-tools icon-split"></i>
+                  <span class="btn-split-number">1</span>
+                  <div class="btn-split-text">Mantenimiento<br>urgente</div>
+                </button>
+                <button class="btn-split btn-pending" data-bs-toggle="modal" data-bs-target="#modalDocumentacionCoche1">
+                  <i class="fas fa-file-alt icon-split"></i>
+                  <span class="btn-split-number">1</span>
+                  <div class="btn-split-text">Documentación<br>próxima</div>
+                </button>
+              </div>
+              <button class="btn btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalRecogidasCoche1">
+                <i class="fas fa-car-side icon-btn"></i>
+                <span class="btn-number">0</span>
+                <div class="btn-text">Recogidas<br>pendientes</div>
+              </button>
+            </div>
+            <button class="btn btn-nueva-reserva w-100" data-bs-toggle="modal" data-bs-target="#modalNuevaReservaCoche">
+              <i class="fas fa-plus me-2"></i>Nueva Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COCHE 2 - Fiat 500 -->
+      <div class="col">
+        <div class="card coche-card">
+          <img src="https://quadis.s3.amazonaws.com/GestorQuadis/Novedades/FIAT_500_13502/fiat-500-1.jpg" alt="Fiat 500" class="coche-img">
+          <button class="btn btn-secondary btn-edit" data-bs-toggle="modal" data-bs-target="#modalEditarCoche2">
+            <i class="fas fa-edit"></i>
+          </button>
+          <div class="coche-header">
+            <h5 class="coche-name">Fiat 500</h5>
+          </div>
+          <div class="card-body d-flex flex-column">
+            <div class="btn-grid">
+              <button class="btn btn-stat btn-urgent" data-bs-toggle="modal" data-bs-target="#modalOcupacionCoche2">
+                <i class="fas fa-car icon-btn"></i>
+                <div class="btn-text">Ocupado</div>
+              </button>
+              <button class="btn btn-stat btn-pending" data-bs-toggle="modal" data-bs-target="#modalLimpiezaCoche2">
+                <i class="fas fa-broom icon-btn"></i>
+                <span class="btn-number">1</span>
+                <div class="btn-text">Limpieza<br>pendiente</div>
+              </button>
+              <div class="btn-split-container">
+                <button class="btn-split btn-ok" data-bs-toggle="modal" data-bs-target="#modalMantenimientoCoche2">
+                  <i class="fas fa-tools icon-split"></i>
+                  <span class="btn-split-number">0</span>
+                  <div class="btn-split-text">Mantenimiento<br>pendiente</div>
+                </button>
+                <button class="btn-split btn-ok" data-bs-toggle="modal" data-bs-target="#modalDocumentacionCoche2">
+                  <i class="fas fa-file-alt icon-split"></i>
+                  <span class="btn-split-number">0</span>
+                  <div class="btn-split-text">Documentación<br>próxima</div>
+                </button>
+              </div>
+              <button class="btn btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalRecogidasCoche2">
+                <i class="fas fa-car-side icon-btn"></i>
+                <span class="btn-number">1</span>
+                <div class="btn-text">Recogidas<br>pendientes</div>
+              </button>
+            </div>
+            <button class="btn btn-nueva-reserva w-100" data-bs-toggle="modal" data-bs-target="#modalNuevaReservaCoche">
+              <i class="fas fa-plus me-2"></i>Nueva Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COCHE 3 - Renault Clio -->
+      <div class="col">
+        <div class="card coche-card">
+          <img src="https://s3-eu-west-1.amazonaws.com/staticeu.izmocars.com/toolkit/commonassets/2024/24renault/24renaultcliotechnohb5rb/24renaultcliotechnohb5rb_animations/colorpix/fr/640x480/renault_24cliotechnohb5rb_blancglacier_angular-front.webp" alt="Renault Clio" class="coche-img">
+          <button class="btn btn-secondary btn-edit" data-bs-toggle="modal" data-bs-target="#modalEditarCoche3">
+            <i class="fas fa-edit"></i>
+          </button>
+          <div class="coche-header">
+            <h5 class="coche-name">Renault Clio</h5>
+          </div>
+          <div class="card-body d-flex flex-column">
+            <div class="btn-grid">
+              <button class="btn btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalOcupacionCoche3">
+                <i class="fas fa-car icon-btn"></i>
+                <div class="btn-text">Libre</div>
+              </button>
+              <button class="btn btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalLimpiezaCoche3">
+                <i class="fas fa-broom icon-btn"></i>
+                <span class="btn-number">0</span>
+                <div class="btn-text">Limpieza<br>pendiente</div>
+              </button>
+              <div class="btn-split-container">
+                <button class="btn-split btn-ok" data-bs-toggle="modal" data-bs-target="#modalMantenimientoCoche3">
+                  <i class="fas fa-tools icon-split"></i>
+                  <span class="btn-split-number">0</span>
+                  <div class="btn-split-text">Mantenimiento<br>pendiente</div>
+                </button>
+                <button class="btn-split btn-ok" data-bs-toggle="modal" data-bs-target="#modalDocumentacionCoche3">
+                  <i class="fas fa-file-alt icon-split"></i>
+                  <span class="btn-split-number">0</span>
+                  <div class="btn-split-text">Documentación<br>próxima</div>
+                </button>
+              </div>
+              <button class="btn btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalRecogidasCoche3">
+                <i class="fas fa-car-side icon-btn"></i>
+                <span class="btn-number">0</span>
+                <div class="btn-text">Recogidas<br>pendientes</div>
+              </button>
+            </div>
+            <button class="btn btn-nueva-reserva w-100" data-bs-toggle="modal" data-bs-target="#modalNuevaReservaCoche">
+              <i class="fas fa-plus me-2"></i>Nueva Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COCHE 4 - Volkswagen Polo -->
+      <div class="col">
+        <div class="card coche-card">
+          <img src="https://cdn-xy.drivek.com/eyJidWNrZXQiOiJkYXRhay1jZG4teHkiLCJrZXkiOiJjb25maWd1cmF0b3ItaW1ncy9jYXJzL2VzL29yaWdpbmFsL1ZPTEtTV0FHRU4vUE9MTy80MDQ4OV9IQVRDSEJBQ0stNS1ET09SUy92b2xrc3dhZ2VuLXBvbG8tMjAyMS1mcm9udC1zaWRlLTEuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMDI0LCJoZWlnaHQiOm51bGwsImZpdCI6ImNvdmVyIn19fQ==" alt="Volkswagen Polo" class="coche-img">
+          <button class="btn btn-secondary btn-edit" data-bs-toggle="modal" data-bs-target="#modalEditarCoche4">
+            <i class="fas fa-edit"></i>
+          </button>
+          <div class="coche-header">
+            <h5 class="coche-name">Volkswagen Polo</h5>
+          </div>
+          <div class="card-body d-flex flex-column">
+            <div class="btn-grid">
+              <button class="btn btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalOcupacionCoche4">
+                <i class="fas fa-car icon-btn"></i>
+                <div class="btn-text">Libre</div>
+              </button>
+              <button class="btn btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalLimpiezaCoche4">
+                <i class="fas fa-broom icon-btn"></i>
+                <span class="btn-number">0</span>
+                <div class="btn-text">Limpieza<br>pendiente</div>
+              </button>
+              <div class="btn-split-container">
+                <button class="btn-split btn-ok" data-bs-toggle="modal" data-bs-target="#modalMantenimientoCoche4">
+                  <i class="fas fa-tools icon-split"></i>
+                  <span class="btn-split-number">0</span>
+                  <div class="btn-split-text">Mantenimiento<br>pendiente</div>
+                </button>
+                <button class="btn-split btn-ok" data-bs-toggle="modal" data-bs-target="#modalDocumentacionCoche4">
+                  <i class="fas fa-file-alt icon-split"></i>
+                  <span class="btn-split-number">0</span>
+                  <div class="btn-split-text">Documentación<br>próxima</div>
+                </button>
+              </div>
+              <button class="btn btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalRecogidasCoche4">
+                <i class="fas fa-car-side icon-btn"></i>
+                <span class="btn-number">0</span>
+                <div class="btn-text">Recogidas<br>pendientes</div>
+              </button>
+            </div>
+            <button class="btn btn-nueva-reserva w-100" data-bs-toggle="modal" data-bs-target="#modalNuevaReservaCoche">
+              <i class="fas fa-plus me-2"></i>Nueva Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOTO POR DEFECTO (oculta) -->
+  <img id="default-car-photo" src="https://cdn.pixabay.com/photo/2016/11/18/17/46/car-1836624_1280.jpg" style="display: none;" alt="Coche por defecto">
+
+  <!-- MODAL NUEVO COCHE -->
+  <div class="modal fade" id="modalNuevoCoche" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Nuevo Coche</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-5">
+          <form>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Marca y Modelo</label>
+                <input type="text" class="form-control form-control-lg" placeholder="ej: Seat Ibiza" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Matrícula</label>
+                <input type="text" class="form-control form-control-lg" placeholder="ej: 1234 ABC" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">Foto del coche</label>
+                <input type="file" class="form-control form-control-lg" accept="image/*">
+                <small class="text-muted">Si no subes foto, se usará una imagen genérica de coche.</small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha Seguro</label>
+                <input type="date" class="form-control form-control-lg">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha ITV</label>
+                <input type="date" class="form-control form-control-lg">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha Impuesto Municipal</label>
+                <input type="date" class="form-control form-control-lg">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Última revisión de aceite</label>
+                <input type="date" class="form-control form-control-lg">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Próxima revisión de aceite</label>
+                <input type="date" class="form-control form-control-lg">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Último cambio de filtros</label>
+                <input type="date" class="form-control form-control-lg">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">Observaciones</label>
+                <textarea class="form-control" rows="3"></textarea>
+              </div>
+            </div>
+            <div class="text-center mt-5">
+              <button type="submit" class="btn btn-primary btn-lg px-5 py-3">
+                <i class="fas fa-save me-2"></i>Crear Coche
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR COCHE 1 -->
+  <div class="modal fade" id="modalEditarCoche1" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Editar Seat Ibiza</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-5">
+          <form>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Marca y Modelo</label>
+                <input type="text" class="form-control form-control-lg" value="Seat Ibiza" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Matrícula</label>
+                <input type="text" class="form-control form-control-lg" value="5678 XYZ" required>
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label fw-bold">Foto actual</label>
+                <div class="text-center mb-3">
+                  <img src="https://www.seat.es/content/dam/public/seat-website/carworlds/ibiza/2025/overview/ibiza-2025-overview-gallery-01.jpg" class="img-fluid rounded" style="max-height: 250px;">
+                </div>
+                <label class="form-label fw-bold">Cambiar foto (opcional)</label>
+                <input type="file" class="form-control form-control-lg" accept="image/*">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha Seguro</label>
+                <input type="date" class="form-control form-control-lg" value="2026-06-01">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha ITV</label>
+                <input type="date" class="form-control form-control-lg" value="2026-01-15">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha Impuesto Municipal</label>
+                <input type="date" class="form-control form-control-lg" value="2025-12-31">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Última revisión de aceite</label>
+                <input type="date" class="form-control form-control-lg" value="2025-10-20">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Próxima revisión de aceite</label>
+                <input type="date" class="form-control form-control-lg" value="2026-04-20">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Último cambio de filtros</label>
+                <input type="date" class="form-control form-control-lg" value="2025-10-20">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">Observaciones</label>
+                <textarea class="form-control" rows="3">Buen estado general</textarea>
+              </div>
+            </div>
+            <div class="text-center mt-5">
+              <button type="submit" class="btn btn-primary btn-lg px-5 py-3">
+                <i class="fas fa-save me-2"></i>Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR COCHE 2 -->
+  <div class="modal fade" id="modalEditarCoche2" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Editar Fiat 500</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-5">
+          <form>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Marca y Modelo</label>
+                <input type="text" class="form-control form-control-lg" value="Fiat 500" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Matrícula</label>
+                <input type="text" class="form-control form-control-lg" value="9012 LMN" required>
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label fw-bold">Foto actual</label>
+                <div class="text-center mb-3">
+                  <img src="https://www.fiat.com/content/dam/fiat/models/500/2024/overview/500-2024-gallery-01.jpg" class="img-fluid rounded" style="max-height: 250px;">
+                </div>
+                <label class="form-label fw-bold">Cambiar foto (opcional)</label>
+                <input type="file" class="form-control form-control-lg" accept="image/*">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha Seguro</label>
+                <input type="date" class="form-control form-control-lg" value="2026-03-01">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha ITV</label>
+                <input type="date" class="form-control form-control-lg" value="2026-02-10">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha Impuesto Municipal</label>
+                <input type="date" class="form-control form-control-lg" value="2025-12-31">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Última revisión de aceite</label>
+                <input type="date" class="form-control form-control-lg" value="2025-11-15">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Próxima revisión de aceite</label>
+                <input type="date" class="form-control form-control-lg" value="2026-05-15">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Último cambio de filtros</label>
+                <input type="date" class="form-control form-control-lg" value="2025-11-15">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">Observaciones</label>
+                <textarea class="form-control" rows="3">Coche en perfecto estado</textarea>
+              </div>
+            </div>
+            <div class="text-center mt-5">
+              <button type="submit" class="btn btn-primary btn-lg px-5 py-3">
+                <i class="fas fa-save me-2"></i>Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR COCHE 3 -->
+  <div class="modal fade" id="modalEditarCoche3" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Editar Renault Clio</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-5">
+          <form>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Marca y Modelo</label>
+                <input type="text" class="form-control form-control-lg" value="Renault Clio" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Matrícula</label>
+                <input type="text" class="form-control form-control-lg" value="3456 OPQ" required>
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label fw-bold">Foto actual</label>
+                <div class="text-center mb-3">
+                  <img src="https://www.renault.es/content/dam/renault/es/vehicles/clio/clio-2024/overview/clio-2024-gallery-01.jpg" class="img-fluid rounded" style="max-height: 250px;">
+                </div>
+                <label class="form-label fw-bold">Cambiar foto (opcional)</label>
+                <input type="file" class="form-control form-control-lg" accept="image/*">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha Seguro</label>
+                <input type="date" class="form-control form-control-lg" value="2026-04-01">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha ITV</label>
+                <input type="date" class="form-control form-control-lg" value="2026-03-20">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha Impuesto Municipal</label>
+                <input type="date" class="form-control form-control-lg" value="2025-12-31">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Última revisión de aceite</label>
+                <input type="date" class="form-control form-control-lg" value="2025-09-10">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Próxima revisión de aceite</label>
+                <input type="date" class="form-control form-control-lg" value="2026-03-10">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Último cambio de filtros</label>
+                <input type="date" class="form-control form-control-lg" value="2025-09-10">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">Observaciones</label>
+                <textarea class="form-control" rows="3">Todo correcto</textarea>
+              </div>
+            </div>
+            <div class="text-center mt-5">
+              <button type="submit" class="btn btn-primary btn-lg px-5 py-3">
+                <i class="fas fa-save me-2"></i>Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR COCHE 4 -->
+  <div class="modal fade" id="modalEditarCoche4" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Editar Volkswagen Polo</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-5">
+          <form>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Marca y Modelo</label>
+                <input type="text" class="form-control form-control-lg" value="Volkswagen Polo" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Matrícula</label>
+                <input type="text" class="form-control form-control-lg" value="7890 RST" required>
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label fw-bold">Foto actual</label>
+                <div class="text-center mb-3">
+                  <img src="https://www.volkswagen.es/content/dam/volkswagen/models/polo/polo-2024/overview/polo-2024-gallery-01.jpg" class="img-fluid rounded" style="max-height: 250px;">
+                </div>
+                <label class="form-label fw-bold">Cambiar foto (opcional)</label>
+                <input type="file" class="form-control form-control-lg" accept="image/*">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha Seguro</label>
+                <input type="date" class="form-control form-control-lg" value="2026-05-01">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha ITV</label>
+                <input type="date" class="form-control form-control-lg" value="2026-04-05">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha Impuesto Municipal</label>
+                <input type="date" class="form-control form-control-lg" value="2025-12-31">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Última revisión de aceite</label>
+                <input type="date" class="form-control form-control-lg" value="2025-08-25">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Próxima revisión de aceite</label>
+                <input type="date" class="form-control form-control-lg" value="2026-02-25">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Último cambio de filtros</label>
+                <input type="date" class="form-control form-control-lg" value="2025-08-25">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">Observaciones</label>
+                <textarea class="form-control" rows="3">Perfecto estado</textarea>
+              </div>
+            </div>
+            <div class="text-center mt-5">
+              <button type="submit" class="btn btn-primary btn-lg px-5 py-3">
+                <i class="fas fa-save me-2"></i>Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL OCUPACIÓN COCHE 1 -->
+  <div class="modal fade" id="modalOcupacionCoche1" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title"><i class="fas fa-calendar-alt me-2"></i>Ocupación - Seat Ibiza</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div id="calendar1" class="fc-calendar"></div>
+          <div class="text-end mt-4">
+            <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalNuevaReservaCoche">
+              <i class="fas fa-plus me-2"></i>Nueva Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL OCUPACIÓN COCHE 2 -->
+  <div class="modal fade" id="modalOcupacionCoche2" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title"><i class="fas fa-calendar-alt me-2"></i>Ocupación - Fiat 500</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div id="calendar2" class="fc-calendar"></div>
+          <div class="text-end mt-4">
+            <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalNuevaReservaCoche">
+              <i class="fas fa-plus me-2"></i>Nueva Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL OCUPACIÓN COCHE 3 -->
+  <div class="modal fade" id="modalOcupacionCoche3" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title"><i class="fas fa-calendar-alt me-2"></i>Ocupación - Renault Clio</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div id="calendar3" class="fc-calendar"></div>
+          <div class="text-end mt-4">
+            <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalNuevaReservaCoche">
+              <i class="fas fa-plus me-2"></i>Nueva Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL OCUPACIÓN COCHE 4 -->
+  <div class="modal fade" id="modalOcupacionCoche4" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title"><i class="fas fa-calendar-alt me-2"></i>Ocupación - Volkswagen Polo</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div id="calendar4" class="fc-calendar"></div>
+          <div class="text-end mt-4">
+            <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalNuevaReservaCoche">
+              <i class="fas fa-plus me-2"></i>Nueva Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LIMPIEZA COCHE 1 -->
+  <div class="modal fade" id="modalLimpiezaCoche1" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title"><i class="fas fa-broom me-2"></i>Limpieza - Seat Ibiza</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>No hay limpieza pendiente</strong>
+          </div>
+          <div class="text-center mt-4">
+            <button class="btn btn-success btn-lg px-5">
+              <i class="fas fa-check me-2"></i>Marcar como Limpio
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LIMPIEZA COCHE 2 -->
+  <div class="modal fade" id="modalLimpiezaCoche2" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title"><i class="fas fa-broom me-2"></i>Limpieza - Fiat 500</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-warning">
+            <strong>Limpieza pendiente tras devolución del cliente</strong>
+          </div>
+          <div class="text-center mt-4">
+            <button class="btn btn-success btn-lg px-5">
+              <i class="fas fa-check me-2"></i>Marcar como Limpio
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LIMPIEZA COCHE 3 -->
+  <div class="modal fade" id="modalLimpiezaCoche3" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title"><i class="fas fa-broom me-2"></i>Limpieza - Renault Clio</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>No hay limpieza pendiente</strong>
+          </div>
+          <div class="text-center mt-4">
+            <button class="btn btn-success btn-lg px-5">
+              <i class="fas fa-check me-2"></i>Marcar como Limpio
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LIMPIEZA COCHE 4 -->
+  <div class="modal fade" id="modalLimpiezaCoche4" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title"><i class="fas fa-broom me-2"></i>Limpieza - Volkswagen Polo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>No hay limpieza pendiente</strong>
+          </div>
+          <div class="text-center mt-4">
+            <button class="btn btn-success btn-lg px-5">
+              <i class="fas fa-check me-2"></i>Marcar como Limpio
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MANTENIMIENTO COCHE 1 -->
+  <div class="modal fade" id="modalMantenimientoCoche1" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title"><i class="fas fa-tools me-2"></i>Mantenimiento Urgente - Seat Ibiza</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-danger">
+            <strong>Problema grave reportado:</strong> Fuga de aceite<br>
+            <strong>Reportado por:</strong> Cliente<br>
+            <strong>Fecha:</strong> 20/12/2025<br>
+            <strong>Estado:</strong> <span class="badge bg-danger">Urgente</span>
+          </div>
+          <hr>
+          <h6>Historial reciente</h6>
+          <ul class="list-group mb-4">
+            <li class="list-group-item d-flex justify-content-between">
+              Cambio de aceite
+              <span class="badge bg-success">10/12/2025</span>
+            </li>
+          </ul>
+          <h6>Cambiar estado</h6>
+          <div class="btn-group w-100 mb-4">
+            <button class="btn btn-warning btn-lg">Pendiente</button>
+            <button class="btn btn-info btn-lg">En curso</button>
+            <button class="btn btn-success btn-lg">Resuelto</button>
+          </div>
+          <label class="form-label fw-bold">Nota</label>
+          <textarea class="form-control" rows="3"></textarea>
+          <div class="text-center mt-4">
+            <button class="btn btn-primary btn-lg px-5">
+              <i class="fas fa-save me-2"></i>Guardar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MANTENIMIENTO COCHE 2 -->
+  <div class="modal fade" id="modalMantenimientoCoche2" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title"><i class="fas fa-tools me-2"></i>Mantenimiento - Fiat 500</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>Sin mantenimiento pendiente</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MANTENIMIENTO COCHE 3 -->
+  <div class="modal fade" id="modalMantenimientoCoche3" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title"><i class="fas fa-tools me-2"></i>Mantenimiento - Renault Clio</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>Sin mantenimiento pendiente</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MANTENIMIENTO COCHE 4 -->
+  <div class="modal fade" id="modalMantenimientoCoche4" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title"><i class="fas fa-tools me-2"></i>Mantenimiento - Volkswagen Polo</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>Sin mantenimiento pendiente</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DOCUMENTACIÓN COCHE 1 -->
+  <div class="modal fade" id="modalDocumentacionCoche1" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Documentación - Seat Ibiza</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-warning">
+            <strong>ITV próxima</strong> - 15/01/2026<br>
+            <strong>Seguro próximo</strong> - 01/02/2026
+          </div>
+          <div class="text-center mt-4">
+            <button class="btn btn-success btn-lg">Marcar como renovado</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DOCUMENTACIÓN COCHE 2 -->
+  <div class="modal fade" id="modalDocumentacionCoche2" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Documentación - Fiat 500</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>Toda la documentación al día</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DOCUMENTACIÓN COCHE 3 -->
+  <div class="modal fade" id="modalDocumentacionCoche3" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Documentación - Renault Clio</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>Toda la documentación al día</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DOCUMENTACIÓN COCHE 4 -->
+  <div class="modal fade" id="modalDocumentacionCoche4" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Documentación - Volkswagen Polo</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>Toda la documentación al día</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL RECOGIDAS COCHE 1 -->
+  <div class="modal fade" id="modalRecogidasCoche1" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title"><i class="fas fa-car-side me-2"></i>Recogidas - Seat Ibiza</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>No hay recogidas pendientes</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL RECOGIDAS COCHE 2 -->
+  <div class="modal fade" id="modalRecogidasCoche2" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title"><i class="fas fa-car-side me-2"></i>Recogidas - Fiat 500</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-warning">
+            <strong>1 recogida pendiente</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL RECOGIDAS COCHE 3 -->
+  <div class="modal fade" id="modalRecogidasCoche3" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title"><i class="fas fa-car-side me-2"></i>Recogidas - Renault Clio</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>No hay recogidas pendientes</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL RECOGIDAS COCHE 4 -->
+  <div class="modal fade" id="modalRecogidasCoche4" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title"><i class="fas fa-car-side me-2"></i>Recogidas - Volkswagen Polo</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>No hay recogidas pendientes</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NUEVA RESERVA COCHE -->
+  <div class="modal fade" id="modalNuevaReservaCoche" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Nueva Reserva de Coche</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-5">
+          <form>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Cliente</label>
+                <input type="text" class="form-control form-control-lg" placeholder="Nombre completo" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Teléfono / Email</label>
+                <input type="text" class="form-control form-control-lg" placeholder="Contacto" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha recogida</label>
+                <input type="date" class="form-control form-control-lg" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold">Hora recogida</label>
+                <input type="time" class="form-control form-control-lg" value="10:00">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha devolución</label>
+                <input type="date" class="form-control form-control-lg" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold">Hora devolución</label>
+                <input type="time" class="form-control form-control-lg" value="10:00">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Días de alquiler</label>
+                <input type="number" class="form-control form-control-lg" min="1" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Precio por día (€)</label>
+                <input type="number" class="form-control form-control-lg" step="0.01" value="50.00" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Precio total (€)</label>
+                <input type="number" class="form-control form-control-lg" step="0.01" readonly>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Quién recoge</label>
+                <input type="text" class="form-control form-control-lg">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">Observaciones</label>
+                <textarea class="form-control" rows="4"></textarea>
+              </div>
+            </div>
+            <div class="text-center mt-5">
+              <button type="button" class="btn btn-secondary btn-lg me-3" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-save me-2"></i>Crear Reserva
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var calendarIds = ['calendar1', 'calendar2', 'calendar3', 'calendar4'];
+      calendarIds.forEach(function(id) {
+        var calendarEl = document.getElementById(id);
+        if (calendarEl) {
+          var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+              left: 'prev,next today',
+              center: 'title',
+              right: ''
+            },
+            height: 'auto',
+            events: []
+          });
+          calendar.render();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

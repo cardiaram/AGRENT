@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AG RENTAL - Dashboard Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #001f3f;
+      --accent: #00d0ff;
+      --ok: #28a745;
+      --warning: #ffc107;
+      --urgent: #dc3545;
+      --info: #17a2b8;
+      --gray: #6c757d;
+    }
+    body {
+      background: white;
+      color: #333;
+    }
+    .navbar {
+      background: var(--primary) !important;
+    }
+    .nav-link {
+      color: #adb5bd !important;
+      font-size: 1.1rem;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--accent) !important;
+    }
+    .title-dashboard {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 3rem;
+    }
+    .stat-card {
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      height: 100%;
+      border: 1px solid #e0e0e0;
+    }
+    .card-header {
+      background: var(--primary);
+      color: white;
+      border-radius: 15px 15px 0 0 !important;
+      padding: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .icon-header {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .count-big {
+      font-size: 4rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .count-label {
+      font-size: 1.1rem;
+      color: #555;
+      margin-top: 0.5rem;
+    }
+    /* Grid general 2x2 */
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 1rem;
+      height: 240px;
+    }
+    /* BOTONES PERSONALIZADOS - SIN CLASE .btn DE BOOTSTRAP */
+    .btn-stat {
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.95rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+      height: 100%;
+      width: 100%;
+      cursor: pointer;
+      border: none; /* Importante: sin borde */
+    }
+    /* HOVER: SOLO OSCURECE EL COLOR */
+    .btn-stat:hover {
+      filter: brightness(0.85);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .icon-btn {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    .btn-text {
+      font-weight: 600;
+      line-height: 1.3;
+      text-align: center;
+    }
+    /* Botones divididos para mantenimiento + documentación en coches */
+    .btn-split-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      height: 100%;
+    }
+    .btn-split {
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.9rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+      height: 100%;
+      border: none;
+    }
+    .btn-split:hover {
+      filter: brightness(0.85);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .icon-split {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+    /* COLORES SEGÚN ESTADO */
+    .btn-ok { background: var(--ok); color: white; }
+    .btn-pending { background: var(--warning); color: black; }
+    .btn-urgent { background: var(--urgent); color: white; }
+    .btn-info { background: var(--info); color: white; }
+    @media (max-width: 992px) {
+      .count-big { font-size: 3.2rem; }
+      .btn-grid { height: 220px; }
+      .icon-btn { font-size: 1.8rem; }
+      .title-dashboard { font-size: 2.2rem; }
+    }
+    @media (max-width: 768px) {
+      .count-big { font-size: 2.8rem; }
+      .btn-grid { height: 200px; gap: 0.8rem; }
+      .title-dashboard { font-size: 2rem; }
+      .card-header { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Menú superior - Administrador -->
+ 
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold fs-4" href="/dashboard.html">AG RENTAL</a>
+    <div class="navbar-nav ms-auto">
+      <a class="nav-link active" href="/dashboard.html">Dashboard</a>
+      <a class="nav-link" href="/apartamentos.html">Apartamentos</a>
+      <a class="nav-link" href="/coches.html">Coches</a>
+      <a class="nav-link" href="/usuarios.html">Usuarios</a>
+      <a class="nav-link text-danger" href="/logout">Salir</a>
+    </div>
+  </div>
+</nav>
+  <div class="container my-5 pt-5">
+    <h1 class="text-center title-dashboard">DASHBOARD</h1>
+    <div class="row g-5">
+      <!-- APARTAMENTOS -->
+      <div class="col-lg-6">
+        <div class="card stat-card">
+          <div class="card-header text-center">
+            <i class="fas fa-building icon-header"></i>
+            <div>APARTAMENTOS</div>
+          </div>
+          <div class="card-body p-4">
+            <div class="row text-center mb-4">
+              <div class="col-6">
+                <div class="count-big text-success">14</div>
+                <p class="count-label">Libres</p>
+              </div>
+              <div class="col-6">
+                <div class="count-big text-danger">2</div>
+                <p class="count-label">Ocupados</p>
+              </div>
+            </div>
+            <div class="btn-grid">
+              <button class="btn-stat btn-info" data-bs-toggle="modal" data-bs-target="#modalAlquileresDashboard">
+                <i class="fas fa-calendar-check icon-btn"></i>
+                <div class="btn-text">2 Alquileres<br>en curso</div>
+              </button>
+              <button class="btn-stat btn-pending" data-bs-toggle="modal" data-bs-target="#modalLimpiezaDashboard">
+                <i class="fas fa-broom icon-btn"></i>
+                <div class="btn-text">3 Limpiezas<br>pendientes</div>
+              </button>
+              <button class="btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalMantenimientoDashboard">
+                <i class="fas fa-tools icon-btn"></i>
+                <div class="btn-text">0 Mantenimientos<br>pendientes</div>
+              </button>
+              <button class="btn-stat btn-ok" data-bs-toggle="modal" data-bs-target="#modalEntregasDashboard">
+                <i class="fas fa-key icon-btn"></i>
+                <div class="btn-text">0 Entregas<br>pendientes</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- COCHES -->
+      <div class="col-lg-6">
+        <div class="card stat-card">
+          <div class="card-header text-center">
+            <i class="fas fa-car icon-header"></i>
+            <div>COCHES</div>
+          </div>
+          <div class="card-body p-4">
+            <div class="row text-center mb-4">
+              <div class="col-6">
+                <div class="count-big text-success">2</div>
+                <p class="count-label">Libres</p>
+              </div>
+              <div class="col-6">
+                <div class="count-big text-danger">0</div>
+                <p class="count-label">Ocupados</p>
+              </div>
+            </div>
+            <div class="btn-grid">
+              <button class="btn-stat btn-ok">
+                <i class="fas fa-calendar-check icon-btn"></i>
+                <div class="btn-text">0 Alquileres<br>en curso</div>
+              </button>
+              <button class="btn-stat btn-pending">
+                <i class="fas fa-broom icon-btn"></i>
+                <div class="btn-text">1 Limpieza<br>pendiente</div>
+              </button>
+              <!-- MANTENIMIENTO + DOCUMENTACIÓN DIVIDIDOS -->
+              <div class="btn-split-container">
+                <div class="btn-split btn-ok">
+                  <i class="fas fa-tools icon-split"></i>
+                  <div class="btn-text">0 Mantenimientos<br>pendientes</div>
+                </div>
+                <div class="btn-split btn-pending">
+                  <i class="fas fa-file-alt icon-split"></i>
+                  <div class="btn-text">1 Documentación<br>próxima a vencer</div>
+                </div>
+              </div>
+              <button class="btn-stat btn-ok">
+                <i class="fas fa-car-side icon-btn"></i>
+                <div class="btn-text">1 Recogida<br>programada</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POP-UPS DEL DASHBOARD (las mismas que desarrollamos en apartamentos) -->
+
+  <!-- MODAL ALQUILERES EN CURSO -->
+  <div class="modal fade" id="modalAlquileresDashboard" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title"><i class="fas fa-calendar-check me-2"></i>Alquileres en Curso</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Aquí iría la lista o calendario de alquileres activos de apartamentos.</p>
+          <div class="text-center mt-4">
+            <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalNuevaReserva">
+              <i class="fas fa-plus me-2"></i>Nueva Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LIMPIEZA -->
+  <div class="modal fade" id="modalLimpiezaDashboard" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title"><i class="fas fa-broom me-2"></i>Limpiezas Pendientes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-warning">
+            <strong>3 limpiezas pendientes</strong><br>
+            Apto 3D - tras salida 27/12/2025<br>
+            Apto 01 - tras salida 26/12/2025<br>
+            Apto 04 - tras salida 25/12/2025
+          </div>
+          <div class="text-center mt-4">
+            <button class="btn btn-success btn-lg px-5">
+              <i class="fas fa-check me-2"></i>Marcar como Limpio
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MANTENIMIENTO -->
+  <div class="modal fade" id="modalMantenimientoDashboard" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title"><i class="fas fa-tools me-2"></i>Mantenimiento Pendiente</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-danger">
+            <strong>Ningún mantenimiento pendiente</strong>
+          </div>
+          <div class="text-center mt-4">
+            <button class="btn btn-primary btn-lg" disabled>
+              Todo OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ENTREGAS DE LLAVES -->
+  <div class="modal fade" id="modalEntregasDashboard" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title"><i class="fas fa-key me-2"></i>Entregas de Llaves</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success">
+            <strong>Ninguna entrega pendiente</strong>
+          </div>
+          <div class="text-center mt-4">
+            <button class="btn btn-success btn-lg" disabled>
+              Todo en orden
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NUEVA RESERVA (la completa que desarrollamos) -->
+  <div class="modal fade" id="modalNuevaReserva" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Nueva Reserva</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-5">
+          <form>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Cliente</label>
+                <input type="text" class="form-control form-control-lg" placeholder="Nombre completo" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Teléfono / Email</label>
+                <input type="text" class="form-control form-control-lg" placeholder="Contacto" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha entrada</label>
+                <input type="date" class="form-control form-control-lg" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold">Hora entrada</label>
+                <input type="time" class="form-control form-control-lg" value="15:00">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha salida</label>
+                <input type="date" class="form-control form-control-lg" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold">Hora salida</label>
+                <input type="time" class="form-control form-control-lg" value="11:00">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Nº noches</label>
+                <input type="number" class="form-control form-control-lg" min="1" value="1" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Precio por noche (€)</label>
+                <input type="number" class="form-control form-control-lg" step="0.01" value="120.00" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Precio total (€)</label>
+                <input type="number" class="form-control form-control-lg" step="0.01" readonly>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Fianza (€)</label>
+                <input type="number" class="form-control form-control-lg" value="200.00">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Importe pagado (€)</label>
+                <input type="number" class="form-control form-control-lg" value="0.00">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Estado pago</label>
+                <select class="form-select form-select-lg">
+                  <option>Pendiente</option>
+                  <option>Señal pagada</option>
+                  <option>Pagado completo</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Quién recoge llaves</label>
+                <input type="text" class="form-control form-control-lg" placeholder="Nombre de quien recoge">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Canal de reserva</label>
+                <select class="form-select form-select-lg">
+                  <option>Directa</option>
+                  <option>Airbnb</option>
+                  <option>Booking</option>
+                  <option>Web propia</option>
+                  <option>Otros</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">Observaciones</label>
+                <textarea class="form-control" rows="4" placeholder="Notas internas, peticiones del cliente, etc."></textarea>
+              </div>
+            </div>
+            <div class="text-center mt-5">
+              <button type="button" class="btn btn-secondary btn-lg me-3" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-save me-2"></i>Crear Reserva
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
